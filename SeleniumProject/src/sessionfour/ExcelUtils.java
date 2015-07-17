@@ -23,9 +23,9 @@ public class ExcelUtils {
 		String filePath = new ApplicationProperties().getProperties().getProperty("filePath");
 		System.out.println(filePath);
 		try {
-			readFile(filePath);//file should be closed before updating
+			//readFile(filePath);//file should be closed before updating
 			//System.out.println("********************");
-			//readSheetData(filePath);
+			readSheetData(filePath);
 		} catch (EncryptedDocumentException e) {
 			e.printStackTrace();
 		} catch (InvalidFormatException e) {
@@ -83,7 +83,7 @@ public class ExcelUtils {
 		while (rows.hasNext()) {
 			Row row = rows.next();
 			if(row.getRowNum() == 1){
-				System.out.println("**********************************");
+				System.out.println("****************************************************************");
 			}
 			Iterator<Cell> cells = row.iterator();
 			while (cells.hasNext()) {
@@ -94,16 +94,16 @@ public class ExcelUtils {
 						break;
 					case Cell.CELL_TYPE_NUMERIC:
 						if (DateUtil.isCellDateFormatted(cell)) {
-							System.out.println(cell.getDateCellValue());
+							System.out.print(cell.getDateCellValue());
 						} else {
-							System.out.println(cell.getNumericCellValue());
+							System.out.print(cell.getNumericCellValue());
 						}
 						break;
 					case Cell.CELL_TYPE_BOOLEAN:
 						System.out.print(cell.getBooleanCellValue());
 						break;
 					case Cell.CELL_TYPE_FORMULA:
-						System.out.println(cell.getCellFormula());
+						System.out.print(cell.getCellFormula());
 						break;
 					default:
 						break;

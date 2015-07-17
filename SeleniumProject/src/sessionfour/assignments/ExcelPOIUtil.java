@@ -1,10 +1,11 @@
 package sessionfour.assignments;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -21,7 +22,13 @@ public class ExcelPOIUtil {
 
 	public static void main(String s[]) {
 		try {
-			readExcel("fileOne", 2, 8);
+			// readExcel("fileOne", 2, 8);
+			// readExcel("fileOne");
+			List<Employee> employees = new ArrayList<Employee>();
+			readExcel("fileOne", employees);
+			for (Employee employee : employees) {
+				System.out.println(employee.toString());
+			}
 		} catch (EncryptedDocumentException e) {
 			e.printStackTrace();
 		} catch (InvalidFormatException e) {
@@ -38,6 +45,7 @@ public class ExcelPOIUtil {
 		Workbook wb = WorkbookFactory.create(inp);
 		Sheet sheet = wb.getSheet(sheetName);
 		Row row = sheet.getRow(rowNum);
+		System.out.println(row.getPhysicalNumberOfCells());
 		Cell cell = null;
 		if (row != null) {
 			cell = row.getCell(cellNum);
@@ -62,31 +70,32 @@ public class ExcelPOIUtil {
 			Iterator<Cell> cells = row.iterator();
 			while (cells.hasNext()) {
 				Cell cell = cells.next();
-				switch (cell.getCellType()) {
-				case Cell.CELL_TYPE_STRING:
-					System.out.print(cell.getStringCellValue());
-					break;
-				case Cell.CELL_TYPE_NUMERIC:
-					if (DateUtil.isCellDateFormatted(cell)) {
-						System.out.println(cell.getDateCellValue());
-					} else {
-						System.out.println(cell.getNumericCellValue());
-					}
-					break;
-				case Cell.CELL_TYPE_BOOLEAN:
-					System.out.print(cell.getBooleanCellValue());
-					break;
-				case Cell.CELL_TYPE_FORMULA:
-					System.out.println(cell.getCellFormula());
-					break;
-				default:
-					break;
-				}
+				System.out.print(getCellValue(cell));
 				System.out.print("\t");
-
 			}
+
 			System.out.println("");
 		}
+
+	}
+
+	public static List<Employee> readExcel(String sheetName, List<Employee> employees)
+			throws EncryptedDocumentException, InvalidFormatException, IOException {
+		InputStream inp = new FileInputStream(getFilePath());
+		Workbook wb = WorkbookFactory.create(inp);
+		Sheet sheet = wb.getSheet(sheetName);
+		Employee emp;
+		Iterator<Row> rows = sheet.iterator();
+		while (rows.hasNext()) {
+			Row row = rows.next();
+			emp = new Employee();
+			if (row.getRowNum() != 0) {
+				emp.assignValues(row);
+				employees.add(emp);
+			}
+
+		}
+		return employees;
 
 	}
 
@@ -106,7 +115,7 @@ public class ExcelPOIUtil {
 				if (DateUtil.isCellDateFormatted(cell)) {
 					cellValue = cell.getDateCellValue();
 				} else {
-					cellValue = cell.getNumericCellValue();
+					cellValue = new Double(cell.getNumericCellValue()).intValue();
 				}
 				break;
 			case Cell.CELL_TYPE_BOOLEAN:
